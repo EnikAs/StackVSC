@@ -9,11 +9,15 @@
 #include <stdlib.h>
 #include <cassert>
 
+
+
+
+
 #define $StackDump(stk) StackDump(stk, __LINE__, __func__, __FILE__)
 #define $printf(...) fprintf(log_file, ##__VA_ARGS__)
 
 
-typedef int elem;
+typedef int elem_t;
 
 extern FILE* log_file;  // да, глобалка, да плохо, а что поделать !
 
@@ -48,14 +52,32 @@ enum for_StackOk_correct_check
     L_CANARY_ERROR,
     R_CANRY_ERROR,
     L_DATA_CANARY_ERROR,
-    R_DATA_CANARY_ERROR
+    R_DATA_CANARY_ERROR,
+    POISONED_VAL,
+    STACK_SIZE_EQ_ZERO,
+    HASH_ERROR,
+    CHECK,
+    REPLACE,
+    BAD_KEY
 };
 
+
+/*
+
+enum for_hash_сalc
+{
+    CHECK = 12312,
+    REPLACE =121234 ,
+    BAD_KEY = 21231
+};
+*/
 struct Stack
 {
 
     uint64_t canary_left = CANARY_CONST;
-    elem* data;
+    elem_t* data;
+    unsigned int hash_stk = 0;
+    unsigned int hash_data;
     int errors = 0;
     int size_of_stack;
     int capacity;
@@ -78,8 +100,14 @@ int               StackReSize                        (Stack* stk, float multiple
 
 int               check_canary                       (Stack* stk, uint64_t* tmp_can_l, uint64_t* tmp_can_r);
 
-int               StackPush                          (Stack* stk, elem value);
+int               StackPush                          (Stack* stk, elem_t value);
 
-elem              StackPop                           (Stack* stk);
+elem_t            StackPop                           (Stack* stk);
+
+unsigned int      murmurHash                         (char * key, unsigned int len);
+
+int               murmurhash_for_stack               (Stack* stk, int key);
+
+int               murmurhash_for_data                (Stack* stk, int key);
 
 #endif // STACKFUNC_H_INCLUDED
