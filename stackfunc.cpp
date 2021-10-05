@@ -28,7 +28,7 @@ void data_ptr_fix (Stack* stk, int key)
     memset(stk->data, POISON666, capacity * sizeof(elem));    
     *(uint64_t*)(stk->data + capacity) = CANARY_CONST;
     stk->capacity = capacity;
-    $printf("capacity1 = %d\n", stk->capacity);
+
     StackOKCheck(stk);
     return CORRECT;
 }
@@ -69,11 +69,12 @@ elem StackPop (Stack* stk)
     }
     elem tmp = stk->data[stk->size_of_stack - 1];
 
+/*
     if (tmp == POISON666)
         $StackDump(stk);
-
     (stk->data[--stk->size_of_stack]) = POISON666;
-    return tmp;// åñëè ñàéç unsigned, òî -- âñå ñâàëèò â ïèçäó !!!
+*/   
+    return tmp;
 
 }
 
@@ -99,8 +100,9 @@ void StackDump (Stack* stk, const int str_num, const char* func_name, const char
     $printf ("\nIn file %s, in function %s on line %d\n", file_name, func_name, str_num);
     if (stk)
     {
-        $printf("-------------------------------------\n");
+        $printf("\n-------------------------------------\n\n");
         $printf("Stack got some problems)))\n");
+        $printf("Stack error code = %d\n", stk->errors);
         $printf("Stack is destructed = ");
         $printf(stk->if_destructed ? "true" : "false");
         $printf("\nleft canary = %ju | ptr = %d", stk->canary_left, &stk->canary_left);
@@ -118,23 +120,30 @@ void StackDump (Stack* stk, const int str_num, const char* func_name, const char
         else   
             $printf("BAD CANARY, DATA IS BROKEN\n");
 
+        $printf("\n-----------------------\n\n");
+
         $printf("left data canary = %ju | ptr = %d ", left_data_canary, (uint64_t*)((char*)stk->data - sizeof(uint64_t)));
         if (left_data_canary == CANARY_CONST)
             $printf(" --- OK !!!\n");
         else   
             $printf("BAD CANARY, DATA IS BROKEN\n");
         //$printf("data[%d] = %ju \n", -1, *((uint64_t*)((char*)stk->data - sizeof(uint64_t))) );
+        if (stk->data)
+        {
         for (int i = 0 ; i < stk->capacity ; i++)
         {
             $printf("data[%d] = %d ", i, stk->data[i]);
             $printf("| ptr = %d\n", &stk->data[i]);
         }
+        
         $printf("right data canary = %ju | ptr = %d", right_data_canary,  (uint64_t*)(stk->data + stk->capacity) );
         if (right_data_canary == CANARY_CONST)
             $printf(" --- OK !!!\n");
         else   
             $printf("BAD CANARY, DATA IS BROKEN\n");
-
+        }
+        else   
+            $printf("BAD DATA PTR!!!!");
     }
     else
     {
@@ -151,32 +160,55 @@ int StackOKCheck (Stack* stk)
         return CORRECT;
 
     if (stk == NULL)
+    {
         $StackDump(stk);
+    }
 
     if (stk->capacity < stk->size_of_stack)
+    {   
+        stk->errors = STACK_OVERFLOW;
         $StackDump(stk);
-
+    }
+    
     if (stk->data == NULL)
+    {
+        stk->errors = BAD_DATA_PTR;
         $StackDump(stk);
-        
+    }
+       
     if (stk->if_destructed == true)
-        $StackDump(stk); 
-
+    {
+        stk->errors = STACK_IS_DESTRUCTED;
+        $StackDump(stk);
+    }
+    
     if (stk->canary_left != CANARY_CONST)
+    {
+        stk->errors = L_CANARY_ERROR;
         $StackDump(stk);
-
+    }
+    
     if (stk->canary_right != CANARY_CONST)
+    {
+        stk->errors = R_CANRY_ERROR;
         $StackDump(stk);
-
+    }
+    
     uint64_t left_data_canary = 0, right_data_canary = 0;
     int tmp_canary_checker = check_canary(stk, &left_data_canary, &right_data_canary);
 
-    if (tmp_canary_checker == 10)
+    if (tmp_canary_checker == L_DATA_CANARY_ERROR)
+    {
+        stk->errors = L_DATA_CANARY_ERROR;
         $StackDump(stk);
-
-    if (tmp_canary_checker == 20)
+    }
+    
+    if (tmp_canary_checker == R_DATA_CANARY_ERROR)
+    {
+        stk->errors = R_DATA_CANARY_ERROR;
         $StackDump(stk);
-
+    }
+    
     return CORRECT;
 }
 
@@ -187,7 +219,9 @@ int check_canary (Stack* stk, uint64_t* tmp_can_l, uint64_t* tmp_can_r)
     //data_ptr_fix(stk, PLUS);
     tmp_can_r = ( (uint64_t*)( (char*)stk->data + stk->capacity * sizeof(elem) ) );
     if (*tmp_can_l != CANARY_CONST)
-        return 10; // TODO ERRORS !!!
+        return L_DATA_CANARY_ERROR; // TODO ERRORS !!!
     if (*tmp_can_r != CANARY_CONST)
-        return 20;
+        return R_DATA_CANARY_ERROR;
+    else
+        return CORRECT;
 }

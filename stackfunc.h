@@ -15,7 +15,7 @@
 
 typedef int elem;
 
-extern FILE* log_file;  //Äà, ãëîáàëüíàÿ ïåðåìåííàÿ, íî áåç íåå êîä óæàñíî íåêðàñèâûé))))
+extern FILE* log_file;  // да, глобалка, да плохо, а что поделать !
 
 const uint64_t CANARY_CONST = 0xDED32DED32DED32;
 
@@ -40,11 +40,23 @@ enum for_stk_ptr_fix
     PLUS
 };
 
+enum for_StackOk_correct_check
+{   
+    STACK_OVERFLOW = 228,
+    BAD_DATA_PTR,
+    STACK_IS_DESTRUCTED,
+    L_CANARY_ERROR,
+    R_CANRY_ERROR,
+    L_DATA_CANARY_ERROR,
+    R_DATA_CANARY_ERROR
+};
+
 struct Stack
 {
 
     uint64_t canary_left = CANARY_CONST;
     elem* data;
+    int errors = 0;
     int size_of_stack;
     int capacity;
     bool if_destructed = false;
@@ -58,7 +70,7 @@ int               StackCtor                          (Stack* stk, int capacity);
 
 int               StackOKCheck                       (Stack* stk);
 
-void              StackDump                          (Stack* stk, const int str_num, const char* func_name, const char* file_name );
+void              StackDump                          (Stack* stk, const int str_num, const char* func_name, const char* file_name);
 
 void              StackDtor                          (Stack* stk);
 
