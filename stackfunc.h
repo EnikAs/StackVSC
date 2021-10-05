@@ -17,9 +17,13 @@ typedef int elem;
 
 extern FILE* log_file;  //Äà, ãëîáàëüíàÿ ïåðåìåííàÿ, íî áåç íåå êîä óæàñíî íåêðàñèâûé))))
 
+const uint64_t CANARY_CONST = 0xDED32DED32DED32;
+
+const float RESIZE_2_3 = 2.0 / 3;
+
 const int ERROR = 0;
 
-const int POISON666 = 0xDEADBEEF;
+const int POISON666 = 1488322;
 
 const int CONST_FOR_MR_DANIIL = 2;
 
@@ -30,28 +34,40 @@ enum for_memory_allocation_check
     MEMORY_LEAK
 };
 
+enum for_stk_ptr_fix
+{
+    MINUS,
+    PLUS
+};
+
 struct Stack
 {
-    elem* data;
 
+    uint64_t canary_left = CANARY_CONST;
+    elem* data;
     int size_of_stack;
     int capacity;
     bool if_destructed = false;
+    uint64_t canary_right = CANARY_CONST;
 
 };
 
-int StackCtor(Stack* stk, int capacity);
+void              data_ptr_fix                       (Stack* stk, int key);
 
-int StackOKCheck (const Stack* stk);
+int               StackCtor                          (Stack* stk, int capacity);
 
-void StackDump (const Stack* stk, const int str_num, const char* func_name, const char* file_name );
+int               StackOKCheck                       (Stack* stk);
 
-void StackDtor (Stack* stk);
+void              StackDump                          (Stack* stk, const int str_num, const char* func_name, const char* file_name );
 
-int StackReSize (Stack* stk);
+void              StackDtor                          (Stack* stk);
 
-int StackPush (Stack* stk, elem value);
+int               StackReSize                        (Stack* stk, float multiple_const);
 
-elem StackPop (Stack* stk);
+int               check_canary                       (Stack* stk, uint64_t* tmp_can_l, uint64_t* tmp_can_r);
+
+int               StackPush                          (Stack* stk, elem value);
+
+elem              StackPop                           (Stack* stk);
 
 #endif // STACKFUNC_H_INCLUDED

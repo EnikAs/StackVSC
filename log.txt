@@ -1,0 +1,112 @@
+capacity1 = 100
+
+In file main.cpp, in function main on line 21
+-------------------------------------
+Stack got some problems)))
+Stack is destructed = false
+left canary = 1003514224580619570 | ptr = 6422264 --- OK !!!
+size = 90
+capacity = 100
+right canary = 1003514224580619570 | ptr = 6422288 --- OK !!!
+left data canary = 1003514224580619570 | ptr = 9047824  --- OK !!!
+data[0] = 90 | ptr = 9047832
+data[1] = 89 | ptr = 9047836
+data[2] = 88 | ptr = 9047840
+data[3] = 87 | ptr = 9047844
+data[4] = 86 | ptr = 9047848
+data[5] = 85 | ptr = 9047852
+data[6] = 84 | ptr = 9047856
+data[7] = 83 | ptr = 9047860
+data[8] = 82 | ptr = 9047864
+data[9] = 81 | ptr = 9047868
+data[10] = 80 | ptr = 9047872
+data[11] = 79 | ptr = 9047876
+data[12] = 78 | ptr = 9047880
+data[13] = 77 | ptr = 9047884
+data[14] = 76 | ptr = 9047888
+data[15] = 75 | ptr = 9047892
+data[16] = 74 | ptr = 9047896
+data[17] = 73 | ptr = 9047900
+data[18] = 72 | ptr = 9047904
+data[19] = 71 | ptr = 9047908
+data[20] = 70 | ptr = 9047912
+data[21] = 69 | ptr = 9047916
+data[22] = 68 | ptr = 9047920
+data[23] = 67 | ptr = 9047924
+data[24] = 66 | ptr = 9047928
+data[25] = 65 | ptr = 9047932
+data[26] = 64 | ptr = 9047936
+data[27] = 63 | ptr = 9047940
+data[28] = 62 | ptr = 9047944
+data[29] = 61 | ptr = 9047948
+data[30] = 60 | ptr = 9047952
+data[31] = 59 | ptr = 9047956
+data[32] = 58 | ptr = 9047960
+data[33] = 57 | ptr = 9047964
+data[34] = 56 | ptr = 9047968
+data[35] = 55 | ptr = 9047972
+data[36] = 54 | ptr = 9047976
+data[37] = 53 | ptr = 9047980
+data[38] = 52 | ptr = 9047984
+data[39] = 51 | ptr = 9047988
+data[40] = 50 | ptr = 9047992
+data[41] = 49 | ptr = 9047996
+data[42] = 48 | ptr = 9048000
+data[43] = 47 | ptr = 9048004
+data[44] = 46 | ptr = 9048008
+data[45] = 45 | ptr = 9048012
+data[46] = 44 | ptr = 9048016
+data[47] = 43 | ptr = 9048020
+data[48] = 42 | ptr = 9048024
+data[49] = 41 | ptr = 9048028
+data[50] = 40 | ptr = 9048032
+data[51] = 39 | ptr = 9048036
+data[52] = 38 | ptr = 9048040
+data[53] = 37 | ptr = 9048044
+data[54] = 36 | ptr = 9048048
+data[55] = 35 | ptr = 9048052
+data[56] = 34 | ptr = 9048056
+data[57] = 33 | ptr = 9048060
+data[58] = 32 | ptr = 9048064
+data[59] = 31 | ptr = 9048068
+data[60] = 30 | ptr = 9048072
+data[61] = 29 | ptr = 9048076
+data[62] = 28 | ptr = 9048080
+data[63] = 27 | ptr = 9048084
+data[64] = 26 | ptr = 9048088
+data[65] = 25 | ptr = 9048092
+data[66] = 24 | ptr = 9048096
+data[67] = 23 | ptr = 9048100
+data[68] = 22 | ptr = 9048104
+data[69] = 21 | ptr = 9048108
+data[70] = 20 | ptr = 9048112
+data[71] = 19 | ptr = 9048116
+data[72] = 18 | ptr = 9048120
+data[73] = 17 | ptr = 9048124
+data[74] = 16 | ptr = 9048128
+data[75] = 15 | ptr = 9048132
+data[76] = 14 | ptr = 9048136
+data[77] = 13 | ptr = 9048140
+data[78] = 12 | ptr = 9048144
+data[79] = 11 | ptr = 9048148
+data[80] = 10 | ptr = 9048152
+data[81] = 9 | ptr = 9048156
+data[82] = 8 | ptr = 9048160
+data[83] = 7 | ptr = 9048164
+data[84] = 6 | ptr = 9048168
+data[85] = 5 | ptr = 9048172
+data[86] = 4 | ptr = 9048176
+data[87] = 3 | ptr = 9048180
+data[88] = 2 | ptr = 9048184
+data[89] = 1 | ptr = 9048188
+data[90] = -1027423550 | ptr = 9048192
+data[91] = -1027423550 | ptr = 9048196
+data[92] = -1027423550 | ptr = 9048200
+data[93] = -1027423550 | ptr = 9048204
+data[94] = -1027423550 | ptr = 9048208
+data[95] = -1027423550 | ptr = 9048212
+data[96] = -1027423550 | ptr = 9048216
+data[97] = -1027423550 | ptr = 9048220
+data[98] = -1027423550 | ptr = 9048224
+data[99] = -1027423550 | ptr = 9048228
+right data canary = 1003514224580619570 | ptr = 9048232 --- OK !!!
