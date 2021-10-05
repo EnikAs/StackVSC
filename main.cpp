@@ -12,12 +12,12 @@ int main()
     {
         StackPush(&stk, i);
     }
-/*
+
     for (int i = 250 ; i > 0 ; i--)
     {
         StackPop(&stk);
     }
-*/
+
     $StackDump(&stk);
 
     StackDtor (&stk);
