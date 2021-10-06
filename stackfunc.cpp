@@ -32,7 +32,7 @@ void data_ptr_fix (Stack* stk, int key)
 
     $murmurhash_for_stack(stk, REPLACE);
     $murmurhash_for_data(stk, REPLACE);
-    StackOKCheck(stk);
+    $StackOKCheck(stk);
     return CORRECT;
 }
 
@@ -49,7 +49,7 @@ int StackReSize (Stack* stk, float multiple_const)
 
     $murmurhash_for_data(stk, REPLACE);
     $murmurhash_for_stack(stk, REPLACE);
-    StackOKCheck(stk);
+    $StackOKCheck(stk);
     return CORRECT;
 }
 
@@ -60,7 +60,7 @@ int StackPush (Stack* stk, elem_t value)
     if (stk->size_of_stack == stk->capacity)
     {
         StackReSize(stk, CONST_FOR_MR_DANIIL);
-        StackOKCheck(stk);
+        $StackOKCheck(stk);
     }
 
     stk->data[stk->size_of_stack++] = value;
@@ -80,12 +80,12 @@ elem_t StackPop (Stack* stk)
     if (stk->size_of_stack - 1  == stk->capacity / 3 )
     {
         StackReSize(stk, RESIZE_2_3);
-        StackOKCheck(stk);
+        $StackOKCheck(stk);
     }
     if (stk->size_of_stack == 0)
     {
         stk->size_of_stack -= 1;
-        StackOKCheck(stk);
+        $StackOKCheck(stk);
     }
     elem_t tmp = stk->data[stk->size_of_stack - 1];
 
@@ -95,20 +95,20 @@ elem_t StackPop (Stack* stk)
         $StackDump(stk);
     }
 
-    StackOKCheck(stk);
+    $StackOKCheck(stk);
 
     (stk->data[--stk->size_of_stack]) = POISON666;
    
     $murmurhash_for_data(stk, REPLACE);
     $murmurhash_for_stack(stk, REPLACE);
-    StackOKCheck(stk);
+    $StackOKCheck(stk);
     return tmp;
 
 }
 
 void StackDtor (Stack* stk)
 {
-    StackOKCheck(stk);
+    $StackOKCheck(stk);
     stk->size_of_stack = 0;
     stk->capacity = 0;
 

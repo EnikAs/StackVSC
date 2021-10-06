@@ -19,8 +19,10 @@
     #define $murmurhash_for_data(stk, key); 
 #endif
 
-#ifdef DEBUG_WITHOUT_HASH
-     
+#ifdef WITHOUT_ANY_DEBUG
+    #define $StackOKCheck(stk); 
+#else
+    #define $StackOKCheck(stk) StackOKCheck(stk)    
 #endif
 
 #define $StackDump(stk) StackDump(stk, __LINE__, __func__, __FILE__)
