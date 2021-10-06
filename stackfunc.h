@@ -9,13 +9,22 @@
 #include <stdlib.h>
 #include <cassert>
 
+#define DEBUG_WITH_HASH
 
+#ifdef DEBUG_WITH_HASH
+    #define $murmurhash_for_stack(stk, key) murmurhash_for_stack(stk, key) 
+    #define $murmurhash_for_data(stk, key) murmurhash_for_data(stk, key) 
+#else
+    #define $murmurhash_for_stack(stk, key);
+    #define $murmurhash_for_data(stk, key); 
+#endif
 
-
+#ifdef DEBUG_WITHOUT_HASH
+     
+#endif
 
 #define $StackDump(stk) StackDump(stk, __LINE__, __func__, __FILE__)
 #define $printf(...) fprintf(log_file, ##__VA_ARGS__)
-
 
 typedef int elem_t;
 
@@ -27,7 +36,9 @@ const float RESIZE_2_3 = 2.0 / 3;
 
 const int ERROR = 0;
 
-const int POISON666 = 1488322;
+const int POISON666 = 1488228322;
+
+const int POISON1488 = 1488;
 
 const int CONST_FOR_MR_DANIIL = 2;
 
@@ -56,9 +67,11 @@ enum for_StackOk_correct_check
     POISONED_VAL,
     STACK_SIZE_EQ_ZERO,
     HASH_ERROR,
+    DATA_HASH_ERROR,
     CHECK,
     REPLACE,
-    BAD_KEY
+    BAD_KEY_DATA_FIX,
+    BAD_KEY_HASH
 };
 
 

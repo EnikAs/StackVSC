@@ -17,6 +17,7 @@ int main()
         StackPop(&stk);
     }
 
+   // stk.data[123] = 228322;
     $StackDump(&stk);
 
     StackDtor (&stk);

@@ -15,6 +15,7 @@ void data_ptr_fix (Stack* stk, int key)
     else
     { 
         printf("INCORRECT KEY, PROGRAMM WILL DO STRANGE THINGS !!!! ");
+        stk->errors = BAD_KEY_DATA_FIX;
         $StackDump(stk);
     }
 }
@@ -29,16 +30,16 @@ void data_ptr_fix (Stack* stk, int key)
     *(uint64_t*)(stk->data + capacity) = CANARY_CONST;
     stk->capacity = capacity;
 
-    murmurhash_for_stack(stk, REPLACE);
-    murmurhash_for_data(stk, REPLACE);
+    $murmurhash_for_stack(stk, REPLACE);
+    $murmurhash_for_data(stk, REPLACE);
     StackOKCheck(stk);
     return CORRECT;
 }
 
 int StackReSize (Stack* stk, float multiple_const)
 {
-    murmurhash_for_data(stk, CHECK);
-    murmurhash_for_stack(stk, CHECK);
+    $murmurhash_for_data(stk, CHECK);
+    $murmurhash_for_stack(stk, CHECK);
     stk->capacity = stk->capacity * multiple_const;
     data_ptr_fix(stk, MINUS);   
     stk->data = (elem_t*) realloc(stk->data, (sizeof(elem_t) * stk->capacity + 2 * sizeof(uint64_t)) );
@@ -46,16 +47,16 @@ int StackReSize (Stack* stk, float multiple_const)
     data_ptr_fix(stk, PLUS);   
     *((uint64_t*)(stk->data + stk->capacity)) = CANARY_CONST;
 
-    murmurhash_for_data(stk, REPLACE);
-    murmurhash_for_stack(stk, REPLACE);
+    $murmurhash_for_data(stk, REPLACE);
+    $murmurhash_for_stack(stk, REPLACE);
     StackOKCheck(stk);
     return CORRECT;
 }
 
 int StackPush (Stack* stk, elem_t value)
 {
-    murmurhash_for_data(stk, CHECK);
-    murmurhash_for_stack(stk, CHECK);
+    $murmurhash_for_data(stk, CHECK);
+    $murmurhash_for_stack(stk, CHECK);
     if (stk->size_of_stack == stk->capacity)
     {
         StackReSize(stk, CONST_FOR_MR_DANIIL);
@@ -65,8 +66,8 @@ int StackPush (Stack* stk, elem_t value)
     stk->data[stk->size_of_stack++] = value;
     //* ((elem_t*) ( (char*)stk->data + (stk->size_of_stack++) * sizeof(elem_t) ) ) = value;
 
-    murmurhash_for_data(stk, REPLACE);
-    murmurhash_for_stack(stk, REPLACE);
+    $murmurhash_for_data(stk, REPLACE);
+    $murmurhash_for_stack(stk, REPLACE);
 
     return 0;
 }
@@ -74,8 +75,8 @@ int StackPush (Stack* stk, elem_t value)
 
 elem_t StackPop (Stack* stk)
 {
-    murmurhash_for_data(stk, CHECK);
-    murmurhash_for_stack(stk, CHECK);
+    $murmurhash_for_data(stk, CHECK);
+    $murmurhash_for_stack(stk, CHECK);
     if (stk->size_of_stack - 1  == stk->capacity / 3 )
     {
         StackReSize(stk, RESIZE_2_3);
@@ -98,8 +99,8 @@ elem_t StackPop (Stack* stk)
 
     (stk->data[--stk->size_of_stack]) = POISON666;
    
-    murmurhash_for_data(stk, REPLACE);
-    murmurhash_for_stack(stk, REPLACE);
+    $murmurhash_for_data(stk, REPLACE);
+    $murmurhash_for_stack(stk, REPLACE);
     StackOKCheck(stk);
     return tmp;
 
@@ -107,6 +108,7 @@ elem_t StackPop (Stack* stk)
 
 void StackDtor (Stack* stk)
 {
+    StackOKCheck(stk);
     stk->size_of_stack = 0;
     stk->capacity = 0;
 
@@ -114,7 +116,7 @@ void StackDtor (Stack* stk)
     free(stk->data);
     free(stk);
     stk->if_destructed = true;
-    (stk->data) = (elem_t*)POISON666;
+    (stk->data) = (elem_t*)POISON1488;
 }
 
 void StackDump (Stack* stk, const int str_num, const char* func_name, const char* file_name)
@@ -159,8 +161,17 @@ void StackDump (Stack* stk, const int str_num, const char* func_name, const char
                 $printf("Error: STACK SIZE BELOW ZERO\n");
                 break;
             case HASH_ERROR:
-                $printf("Error: HASH ERROR\n");
+                $printf("Error: STACK (NOT DATA IN STACK) HASH ERROR\n");
                 break;
+            case DATA_HASH_ERROR:
+                $printf("Error: DATA HASH ERROR\n");
+                break;
+            case BAD_KEY_HASH:
+                $printf("Error: INCORRECT KEY OF USING HASH FUNCTIONS\n");
+                break;
+            case BAD_KEY_DATA_FIX:
+                $printf("Error: INCORRECT KEY OF USING DATA FIX FUNCTIONS\n");
+                break;                
             default:
                 $printf("Error: CONGRATULATIONS ! (THERE IS NO ERRORS !!!)\n");
                 break;
@@ -184,18 +195,28 @@ void StackDump (Stack* stk, const int str_num, const char* func_name, const char
 
         $printf("\n-----------------------\n\n");
 
+       
+
+        if (stk->data)
+        {
         $printf("left data canary = %ju | ptr = %d ", left_data_canary, (uint64_t*)((char*)stk->data - sizeof(uint64_t)));
         if (left_data_canary == CANARY_CONST)
             $printf(" --- OK !!!\n");
         else   
             $printf("BAD CANARY, DATA IS BROKEN\n");
-        //$printf("data[%d] = %ju \n", -1, *((uint64_t*)((char*)stk->data - sizeof(uint64_t))) );
-        if (stk->data)
-        {
+
         for (int i = 0 ; i < stk->capacity ; i++)
         {
+            if (stk->data[i] == POISON666)
+            {
+                $printf("data[%d] = POISON666 ", i);
+                $printf("| ptr = %d\n", &stk->data[i]); 
+            }
+            else
+            {
             $printf("data[%d] = %d ", i, stk->data[i]);
             $printf("| ptr = %d\n", &stk->data[i]);
+            }        
         }
         
         $printf("right data canary = %ju | ptr = %d", right_data_canary,  (uint64_t*)(stk->data + stk->capacity) );
@@ -212,7 +233,8 @@ void StackDump (Stack* stk, const int str_num, const char* func_name, const char
         $printf("stk = NULL!!!");
     }
 
-   assert(ERROR && "Bad stk");
+    //StackDtor(stk);
+    assert(ERROR && "Bad stk");
 
 }
 
@@ -225,6 +247,9 @@ int StackOKCheck (Stack* stk)
     {
         $StackDump(stk);
     }
+
+    $murmurhash_for_data(stk, CHECK);
+    $murmurhash_for_stack(stk, CHECK);
 
     if (stk->errors != 0)
         $StackDump(stk);
@@ -362,7 +387,11 @@ int murmurhash_for_stack (Stack* stk, int key)
         stk->hash_stk = hash;
     }
     else
-        return BAD_KEY;    
+    {
+        stk->errors = BAD_KEY_HASH;
+        $StackDump(stk);
+        return BAD_KEY_HASH;
+    }     
 }
 
 int murmurhash_for_data (Stack* stk, int key)
@@ -374,14 +403,18 @@ int murmurhash_for_data (Stack* stk, int key)
         return CORRECT;
     else if (key == CHECK && stk->hash_data != hash)
     {
-        stk->errors = HASH_ERROR;
+        stk->errors = DATA_HASH_ERROR;
         $StackDump(stk);
-        return HASH_ERROR;
+        return DATA_HASH_ERROR;
     }
     else if (key == REPLACE)
     {
         stk->hash_data = hash;
     }
     else
-        return BAD_KEY;    
+    {
+        stk->errors = BAD_KEY_HASH;
+        $StackDump(stk);
+        return BAD_KEY_HASH;
+    }    
 }
