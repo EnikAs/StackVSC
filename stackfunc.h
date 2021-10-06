@@ -40,7 +40,7 @@ const int ERROR = 0;
 
 const int POISON666 = 1488228322;
 
-const int POISON1488 = 1488;
+const int POISON1488 = 322;
 
 const int CONST_FOR_MR_DANIIL = 2;
 
@@ -59,7 +59,7 @@ enum for_stk_ptr_fix
 
 enum for_StackOk_correct_check
 {   
-    STACK_OVERFLOW = 228,
+    STACK_OVERFLOW,
     BAD_DATA_PTR,
     STACK_IS_DESTRUCTED,
     L_CANARY_ERROR,
@@ -93,7 +93,7 @@ struct Stack
     elem_t* data;
     unsigned int hash_stk = 0;
     unsigned int hash_data;
-    int errors = 0;
+    int errors = -213;
     int size_of_stack;
     int capacity;
     bool if_destructed = false;
