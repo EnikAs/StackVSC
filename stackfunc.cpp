@@ -55,6 +55,7 @@ int StackReSize (Stack* stk, float multiple_const)
 
 int StackPush (Stack* stk, elem_t value)
 {
+    $StackOKCheck(stk);
     $murmurhash_for_data(stk, CHECK);
     $murmurhash_for_stack(stk, CHECK);
     if (stk->size_of_stack == stk->capacity)
@@ -68,13 +69,14 @@ int StackPush (Stack* stk, elem_t value)
 
     $murmurhash_for_data(stk, REPLACE);
     $murmurhash_for_stack(stk, REPLACE);
-
+    $StackOKCheck(stk);
     return 0;
 }
 
 
 elem_t StackPop (Stack* stk)
 {
+    $StackOKCheck(stk);
     $murmurhash_for_data(stk, CHECK);
     $murmurhash_for_stack(stk, CHECK);
     if (stk->size_of_stack - 1  == stk->capacity / 3 )
@@ -121,6 +123,11 @@ void StackDtor (Stack* stk)
 
 void StackDump (Stack* stk, const int str_num, const char* func_name, const char* file_name)
 {
+    if (stk->if_destructed == true)
+    {
+        $printf("STACK IS DESTRUCTED !!!");
+        assert(ERROR && "STACK IS DESTRUCTED!!!");
+    }
     uint64_t left_data_canary = *((uint64_t*)((char*)stk->data - sizeof(uint64_t))); 
     uint64_t right_data_canary = *((uint64_t*)(stk->data + stk->capacity));
     //check_canary(stk, left_data_canary, right_data_canary);
@@ -240,6 +247,14 @@ void StackDump (Stack* stk, const int str_num, const char* func_name, const char
 
 int StackOKCheck (Stack* stk)
 {
+
+    
+    if (stk->if_destructed == true)
+    { 
+        stk->errors = STACK_IS_DESTRUCTED;
+        $StackDump(stk);
+    }
+
     if (stk->size_of_stack == 0 && stk->capacity == 0)
         return CORRECT;
 
@@ -269,12 +284,6 @@ int StackOKCheck (Stack* stk)
     if (stk->data == NULL)
     {
         stk->errors = BAD_DATA_PTR;
-        $StackDump(stk);
-    }
-       
-    if (stk->if_destructed == true)
-    {
-        stk->errors = STACK_IS_DESTRUCTED;
         $StackDump(stk);
     }
     

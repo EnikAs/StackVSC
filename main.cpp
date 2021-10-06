@@ -18,9 +18,11 @@ int main()
     }
 
    // stk.data[123] = 228322;
-    $StackDump(&stk);
+    //$StackDump(&stk);
 
     StackDtor (&stk);
+
+    StackPush(&stk, 12);
 
     return 0;
 }
