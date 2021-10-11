@@ -26,7 +26,9 @@
     #define $StackOKCheck(stk) StackOKCheck(stk)    
 #endif
 
-FILE* log_file = fopen("log.txt", "w");;  // да, глобалка, да плохо, а что поделать
+extern FILE* log_file;// a >> w 
+
+//FILE* log_file = fopen("log.txt", "w");  // да, глобалка, да плохо, а что поделать
 
 #define PRINT_LINE printf("I'm at line %d at function %s\n", __LINE__, __func__);
 

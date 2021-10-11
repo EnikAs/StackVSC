@@ -7,6 +7,8 @@ int main()
     //printf("asd");
     Stack stk = {};
     StackCtor(&stk, 100);
+
+    /*
     extern FILE* log_file;// a >> w 
     FILE* file_for_calc = fopen("calc.txt", "r");
     if (file_for_calc == NULL)
@@ -23,8 +25,8 @@ int main()
     $StackDump(&stk);
 
     StackDtor(&stk);
+   */
    
-   /*
     for (int i = 500 ; i > 0 ; i--)
     {
         StackPush(&stk, i);
@@ -45,7 +47,7 @@ int main()
 
     $StackDump(&stk);
     StackDtor(&stk);
-     */
+    
 
     return 0;
 }

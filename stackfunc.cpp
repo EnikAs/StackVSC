@@ -1,7 +1,7 @@
 #include "stackfunc.h"
 
-//FILE* log_file = fopen("log.txt", "w");// a >> w 
-extern FILE* log_file;// a >> w 
+FILE* log_file = fopen("log.txt", "w");// a >> w 
+//extern FILE* log_file;// a >> w 
 
 void data_ptr_fix (Stack* stk, int key)
 {
@@ -23,13 +23,19 @@ void data_ptr_fix (Stack* stk, int key)
 
  int StackCtor (Stack* stk, int capacity)
 {
-    stk->data = (elem_t*) realloc(stk->data, ( sizeof(elem_t) * capacity + 2 * sizeof(uint64_t) ));//calloc
-    //stk->data = (elem_t*) realloc(stk->data, sizeof(elem_t) * capacity );
+    int char_in_elem_t_cunt = 0;
+    while (char_in_elem_t_cunt * sizeof(char) < sizeof(elem_t))
+    {
+        char_in_elem_t_cunt++;
+    }
+
+    //stk->data = (elem_t*) realloc(stk->data, ( sizeof(elem_t) * capacity + 2 * sizeof(uint64_t) ));//calloc
+    stk->data = (elem_t*) calloc(capacity * char_in_elem_t_cunt + 2 * 8, sizeof(char));
     *(uint64_t*)stk->data = CANARY_CONST;
     
-    data_ptr_fix(stk, PLUS);   
+    data_ptr_fix(stk, PLUS);
     
-    memset(stk->data, 0, capacity * sizeof(elem_t));    
+    memset(stk->data, 0, capacity * sizeof(elem_t));
     *(uint64_t*)(stk->data + capacity) = CANARY_CONST;
     stk->capacity = capacity;
 
@@ -138,23 +144,20 @@ void StackDump (Stack* stk, const int str_num, const char* func_name, const char
     if (log_file == NULL)
         printf("log file = NULL!!");
 
-    
-    PRINT_LINE
     if (stk->if_destructed == true)
     {
         $printf("STACK IS DESTRUCTED !!!");
         assert(ERROR && "STACK IS DESTRUCTED!!!");
     }
-    PRINT_LINE
+    
     uint64_t left_data_canary  = *((uint64_t*)((char*)stk->data - sizeof(uint64_t))); 
     uint64_t right_data_canary = *((uint64_t*)(stk->data + stk->capacity));
-    PRINT_LINE
+    
     $printf ("\nIn file %s, in function %s on line %d\n", file_name, func_name, str_num);
-    printf ("\nIn file %s, in function %s on line %d\n", file_name, func_name, str_num);
-    PRINT_LINE
+    //printf ("\nIn file %s, in function %s on line %d\n", file_name, func_name, str_num);
+    
     if (stk)
     {
-        PRINT_LINE
         $printf("\n-------------------------------------\n\n");
         $printf("Stack got some problems)))\n");
         switch (stk->errors)
