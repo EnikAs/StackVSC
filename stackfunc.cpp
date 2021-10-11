@@ -1,6 +1,7 @@
 #include "stackfunc.h"
 
-FILE* log_file = fopen("log.txt", "w");
+//FILE* log_file = fopen("log.txt", "w");// a >> w 
+extern FILE* log_file;// a >> w 
 
 void data_ptr_fix (Stack* stk, int key)
 {
@@ -14,7 +15,7 @@ void data_ptr_fix (Stack* stk, int key)
     }
     else
     { 
-        printf("INCORRECT KEY, PROGRAMM WILL DO STRANGE THINGS !!!! ");
+        printf("INCORRECT KEY, PROGRAMM WILL DO STRANGE THINGS !!!! Farewell to your hard Drive.");
         stk->errors = BAD_KEY_DATA_FIX;
         $StackDump(stk);
     }
@@ -22,11 +23,13 @@ void data_ptr_fix (Stack* stk, int key)
 
  int StackCtor (Stack* stk, int capacity)
 {
-    stk->data = (elem_t*) realloc(stk->data, ( sizeof(elem_t) * capacity + 2 * sizeof(uint64_t) ));
+    stk->data = (elem_t*) realloc(stk->data, ( sizeof(elem_t) * capacity + 2 * sizeof(uint64_t) ));//calloc
     //stk->data = (elem_t*) realloc(stk->data, sizeof(elem_t) * capacity );
     *(uint64_t*)stk->data = CANARY_CONST;
+    
     data_ptr_fix(stk, PLUS);   
-    memset(stk->data, POISON666, capacity * sizeof(elem_t));    
+    
+    memset(stk->data, 0, capacity * sizeof(elem_t));    
     *(uint64_t*)(stk->data + capacity) = CANARY_CONST;
     stk->capacity = capacity;
 
@@ -40,10 +43,13 @@ int StackReSize (Stack* stk, float multiple_const)
 {
     $murmurhash_for_data(stk, CHECK);
     $murmurhash_for_stack(stk, CHECK);
+
     stk->capacity = stk->capacity * multiple_const;
+ 
     data_ptr_fix(stk, MINUS);   
     stk->data = (elem_t*) realloc(stk->data, (sizeof(elem_t) * stk->capacity + 2 * sizeof(uint64_t)) );
     *(uint64_t*)stk->data = CANARY_CONST;
+    
     data_ptr_fix(stk, PLUS);   
     *((uint64_t*)(stk->data + stk->capacity)) = CANARY_CONST;
 
@@ -58,6 +64,7 @@ int StackPush (Stack* stk, elem_t value)
     $StackOKCheck(stk);
     $murmurhash_for_data(stk, CHECK);
     $murmurhash_for_stack(stk, CHECK);
+    
     if (stk->size_of_stack == stk->capacity)
     {
         StackReSize(stk, CONST_FOR_MR_DANIIL);
@@ -69,6 +76,7 @@ int StackPush (Stack* stk, elem_t value)
 
     $murmurhash_for_data(stk, REPLACE);
     $murmurhash_for_stack(stk, REPLACE);
+    
     $StackOKCheck(stk);
     return 0;
 }
@@ -79,6 +87,7 @@ elem_t StackPop (Stack* stk)
     $StackOKCheck(stk);
     $murmurhash_for_data(stk, CHECK);
     $murmurhash_for_stack(stk, CHECK);
+    
     if (stk->size_of_stack - 1  == stk->capacity / 3 )
     {
         StackReSize(stk, RESIZE_2_3);
@@ -89,6 +98,7 @@ elem_t StackPop (Stack* stk)
         stk->size_of_stack -= 1;
         $StackOKCheck(stk);
     }
+    
     elem_t tmp = stk->data[stk->size_of_stack - 1];
 
     if (tmp == POISON666)
@@ -103,9 +113,9 @@ elem_t StackPop (Stack* stk)
    
     $murmurhash_for_data(stk, REPLACE);
     $murmurhash_for_stack(stk, REPLACE);
+    
     $StackOKCheck(stk);
     return tmp;
-
 }
 
 void StackDtor (Stack* stk)
@@ -116,26 +126,35 @@ void StackDtor (Stack* stk)
 
     data_ptr_fix(stk, MINUS);
     free(stk->data);
-    free(stk);
+
     stk->if_destructed = true;
     (stk->data) = (elem_t*)POISON1488;
+
+    free(stk);
 }
 
 void StackDump (Stack* stk, const int str_num, const char* func_name, const char* file_name)
 {
+    if (log_file == NULL)
+        printf("log file = NULL!!");
+
+    
+    PRINT_LINE
     if (stk->if_destructed == true)
     {
         $printf("STACK IS DESTRUCTED !!!");
         assert(ERROR && "STACK IS DESTRUCTED!!!");
     }
-    uint64_t left_data_canary = *((uint64_t*)((char*)stk->data - sizeof(uint64_t))); 
+    PRINT_LINE
+    uint64_t left_data_canary  = *((uint64_t*)((char*)stk->data - sizeof(uint64_t))); 
     uint64_t right_data_canary = *((uint64_t*)(stk->data + stk->capacity));
-    //check_canary(stk, left_data_canary, right_data_canary);
-    //left_data_canary = ((uint64_t*)((char*)stk->data - sizeof(uint64_t)));
-
+    PRINT_LINE
     $printf ("\nIn file %s, in function %s on line %d\n", file_name, func_name, str_num);
+    printf ("\nIn file %s, in function %s on line %d\n", file_name, func_name, str_num);
+    PRINT_LINE
     if (stk)
     {
+        PRINT_LINE
         $printf("\n-------------------------------------\n\n");
         $printf("Stack got some problems)))\n");
         switch (stk->errors)
@@ -202,8 +221,6 @@ void StackDump (Stack* stk, const int str_num, const char* func_name, const char
 
         $printf("\n-----------------------\n\n");
 
-       
-
         if (stk->data)
         {
         $printf("left data canary = %ju | ptr = %d ", left_data_canary, (uint64_t*)((char*)stk->data - sizeof(uint64_t)));
@@ -240,15 +257,12 @@ void StackDump (Stack* stk, const int str_num, const char* func_name, const char
         $printf("stk = NULL!!!");
     }
 
-    //StackDtor(stk);
     assert(ERROR && "Bad stk");
 
 }
 
 int StackOKCheck (Stack* stk)
 {
-
-    
     if (stk->if_destructed == true)
     { 
         stk->errors = STACK_IS_DESTRUCTED;
@@ -319,15 +333,18 @@ int StackOKCheck (Stack* stk)
 
 int check_canary (Stack* stk, uint64_t* tmp_can_l, uint64_t* tmp_can_r)
 {
-    tmp_can_l = ((uint64_t*)((char*)stk->data - sizeof(uint64_t)) );
-    tmp_can_r = ( (uint64_t*)( (char*)stk->data + stk->capacity * sizeof(elem_t) ) );
+    tmp_can_l = ((uint64_t*) ((char*) stk->data - sizeof(uint64_t)) );
+    tmp_can_r = ((uint64_t*) ((char*) stk->data + stk->capacity * sizeof(elem_t) ) );
+
     if (*tmp_can_l != CANARY_CONST)
         return L_DATA_CANARY_ERROR;
+
     if (*tmp_can_r != CANARY_CONST)
         return R_DATA_CANARY_ERROR;
     else
         return CORRECT;
 }
+
 unsigned int murmurHash (char * key, unsigned int len)
 {
   const unsigned int m = 0x5bd1e995;
@@ -378,10 +395,10 @@ unsigned int murmurHash (char * key, unsigned int len)
 int murmurhash_for_stack (Stack* stk, int key)
 {
     unsigned int hash = 0;
-    hash += murmurHash((char*)&stk->capacity, sizeof(int) );
-    hash += murmurHash((char*)&stk->size_of_stack, sizeof(int) );
-    hash += murmurHash((char*)&stk->if_destructed, sizeof(bool) );
-    hash += murmurHash((char*)&stk->errors, sizeof(int) );
+    hash ^= murmurHash((char*)&stk->capacity, sizeof(int) );
+    hash ^= murmurHash((char*)&stk->size_of_stack, sizeof(int) );
+    hash ^= murmurHash((char*)&stk->if_destructed, sizeof(bool) );
+    hash ^= murmurHash((char*)&stk->errors, sizeof(int) );
 
     if (key == CHECK && stk->hash_stk == hash)
         return CORRECT;

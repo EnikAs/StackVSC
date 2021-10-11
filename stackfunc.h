@@ -8,29 +8,34 @@
 #include <string.h>
 #include <stdlib.h>
 #include <cassert>
+//#include "calcfunc.h"
 
 #define DEBUG_WITH_HASH
 
 #ifdef DEBUG_WITH_HASH
     #define $murmurhash_for_stack(stk, key) murmurhash_for_stack(stk, key) 
-    #define $murmurhash_for_data(stk, key) murmurhash_for_data(stk, key) 
+    #define $murmurhash_for_data(stk, key)  murmurhash_for_data(stk, key) 
 #else
-    #define $murmurhash_for_stack(stk, key);
-    #define $murmurhash_for_data(stk, key); 
+    #define $murmurhash_for_stack(stk, key)
+    #define $murmurhash_for_data(stk, key) 
 #endif
 
 #ifdef WITHOUT_ANY_DEBUG
-    #define $StackOKCheck(stk); 
+    #define $StackOKCheck(stk) 
 #else
     #define $StackOKCheck(stk) StackOKCheck(stk)    
 #endif
 
-#define $StackDump(stk) StackDump(stk, __LINE__, __func__, __FILE__)
-#define $printf(...) fprintf(log_file, ##__VA_ARGS__)
+FILE* log_file = fopen("log.txt", "w");;  // да, глобалка, да плохо, а что поделать
+
+#define PRINT_LINE printf("I'm at line %d at function %s\n", __LINE__, __func__);
+
+#define $StackDump(stk)  StackDump(stk, __LINE__, __func__, __FILE__)
+#define $printf(...)     fprintf(log_file, ##__VA_ARGS__)
+//#define $printf printf
 
 typedef int elem_t;
 
-extern FILE* log_file;  // да, глобалка, да плохо, а что поделать !
 
 const uint64_t CANARY_CONST = 0xDED32DED32DED32;
 
@@ -38,7 +43,7 @@ const float RESIZE_2_3 = 2.0 / 3;
 
 const int ERROR = 0;
 
-const int POISON666 = 1488228322;
+const int POISON666 = 1488228;
 
 const int POISON1488 = 322;
 
@@ -59,7 +64,7 @@ enum for_stk_ptr_fix
 
 enum for_StackOk_correct_check
 {   
-    STACK_OVERFLOW,
+    STACK_OVERFLOW = 112,
     BAD_DATA_PTR,
     STACK_IS_DESTRUCTED,
     L_CANARY_ERROR,
@@ -70,22 +75,18 @@ enum for_StackOk_correct_check
     STACK_SIZE_EQ_ZERO,
     HASH_ERROR,
     DATA_HASH_ERROR,
-    CHECK,
-    REPLACE,
+    //CHECK,
+    //REPLACE,
     BAD_KEY_DATA_FIX,
     BAD_KEY_HASH
 };
 
-
-/*
-
-enum for_hash_сalc
+enum for_hash_calc 
 {
-    CHECK = 12312,
-    REPLACE =121234 ,
-    BAD_KEY = 21231
+    CHECK = 11,
+    REPLACE =12
 };
-*/
+
 struct Stack
 {
 
@@ -93,7 +94,7 @@ struct Stack
     elem_t* data;
     unsigned int hash_stk = 0;
     unsigned int hash_data;
-    int errors = -213;
+    int errors = 0;
     int size_of_stack;
     int capacity;
     bool if_destructed = false;
